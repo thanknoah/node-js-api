@@ -1,0 +1,45 @@
+// Preset variables
+var mysql = require('mysql');
+const express = require("express");
+
+// DB connection
+var con = mysql.createConnection({
+  host: "host_ip",
+  user: "host_user",
+  password: "host_password",
+  database: "host_db"
+});
+
+con.connect(function(err) {
+  if (err) { throw err };
+  
+  console.log("Connected!");
+});
+
+// Request Handler
+const app = express();
+
+app.get("/", function(req, res) {
+   // Getting info
+   var id = req.query.id;
+   var key = req.query.key;
+   const SQL = `SELECT * FROM _key WHERE hwids = '${id}' AND key_ = '${key}';`;
+   
+   // Querying
+   con.query(SQL, function (err, result, fields) {
+     if (err) { 
+       throw err 
+     }
+     
+     // Result
+     if (typeof result !== 'undefined' && result.length == 0) {
+        res.send("Unauthorized");
+     } else {
+        res.send("Authorized");
+     }  
+   });
+});
+
+app.listen(process.env.port || 3000, function () {
+    console.log("The server is online.");
+});
